@@ -1,14 +1,1 @@
-{
-  "name": "mevidey-api",
-  "version": "1.0.0",
-  "description": "Serverless API for video URLs on Vercel",
-  "main": "api/get-video.js",
-  "scripts": {
-    "start": "node api/get-video.js"
-  },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2"
-  }
-}
+{"name":"mevidey-api","version":"1.0.0","description":"Serverless API for video URLs on Vercel","main":"api/get-video.js","scripts":{"start":"node api/get-video.js"},"dependencies":{"cors":"^2.8.5","dotenv":"^16.4.5","express":"^4.19.2"}}
