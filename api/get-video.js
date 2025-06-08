@@ -1,69 +1,60 @@
 // api/get-video.js
 
-// IDEALNYA: Daftar ini harus diambil dari database atau Environment Variable yang lebih terstruktur.
-// Untuk contoh ini, kita simpan dalam objek di sini (jika tidak pakai DB/Env Vars).
-// Jika Anda pakai Environment Variable, formatnya perlu disesuaikan.
-// Misal: VIDEO_MAP="mpDeq1:https://cdn.videy.co/mpDeq1.mp4,AbX19RQp1:https://cdn.videy.co/AbX19RQp1.mp4"
-// Lalu di kode ini Anda parsing string tersebut.
-
-// Jika Anda menggunakan Environment Variable 'VIDEO_URL_MAP' di Vercel:
+// Mengambil string VIDEO_URL_MAP dari environment variable Vercel
 const rawVideoUrlMap = process.env.VIDEO_URL_MAP;
-// Contoh parsing string "id1:url1,id2:url2" menjadi Map
+
+// Menginisialisasi Map untuk menyimpan pasangan ID unik dan URL video
 const videoMap = new Map();
+
+// Parsing string VIDEO_URL_MAP jika ada
 if (rawVideoUrlMap) {
+    // Memisahkan string berdasarkan koma untuk mendapatkan setiap pasangan ID:URL
     rawVideoUrlMap.split(',').forEach(pair => {
+        // Memisahkan setiap pasangan ID:URL berdasarkan titik dua
         const [id, url] = pair.split(':');
+        // Memastikan ID dan URL ada dan kemudian menyimpannya ke dalam Map
         if (id && url) {
-            videoMap.set(id.trim(), url.trim());
+            videoMap.set(id.trim(), url.trim()); // trim() untuk menghapus spasi di awal/akhir
         }
     });
 } else {
-    // FALLBACK: Jika tidak ada Environment Variable, gunakan hardcode ini (HANYA UNTUK DEBUG/TEST)
-    // Dalam produksi, HARUS dari Environment Variable atau database
-    videoMap.set('mpDeq1', 'https://cdn.videy.co/mpDeq1.mp4');
-    videoMap.set('AbX19RQp1', 'https://cdn.videy.co/AbX19RQp1.mp4');
-    videoMap.set('4dxBUUww1', 'https://cdn.videy.co/4dxBUUww1.mp4');
-    videoMap.set('video4', 'https://cdn.videy.co/video4.mp4');
-    // ... tambahkan semua ID unik dan URL lengkap Anda di sini
+    // Pesan peringatan jika environment variable tidak ditemukan (untuk debugging)
+    // Dalam produksi, ini seharusnya tidak terjadi jika sudah diatur dengan benar
+    console.warn("WARNING: VIDEO_URL_MAP environment variable not found. Video map will be empty.");
 }
 
 
+// Fungsi utama yang akan dijalankan oleh Vercel sebagai Serverless Function
 module.exports = (req, res) => {
-    // CORS headers
-    res.setHeader('Access-Control-Allow-Origin', 'https://viocc.pages.dev'); // Ganti dengan domain frontend Anda
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    // Mengatur header CORS agar frontend Anda bisa mengakses API
+    // Ganti 'https://viocc.pages.dev' dengan domain frontend Anda yang sebenarnya
+    res.setHeader('Access-Control-Allow-Origin', 'https://viocc.pages.dev');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS'); // Izinkan metode GET dan OPTIONS
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+    // Menangani permintaan OPTIONS (preflight request untuk CORS)
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
 
-    const videoId = req.query.id; // Mengambil ID unik dari query parameter
+    // Mengambil 'id' video dari query parameter URL (misalnya ?id=tSpwxCxv1)
+    const videoId = req.query.id;
 
-    // --- Logika Autentikasi/Otorisasi ---
-    // (Opsional, tapi sangat direkomendasikan untuk video pribadi)
-    // Misalnya, periksa token JWT dari header Authorization:
-    // const authHeader = req.headers.authorization;
-    // if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    //     return res.status(401).json({ message: 'Authorization token required.' });
-    // }
-    // const token = authHeader.split(' ')[1];
-    // if (!isValidToken(token)) { // Implementasikan fungsi isValidToken Anda
-    //     return res.status(401).json({ message: 'Invalid or expired token.' });
-    // }
-    // -------------------------------------
-
+    // Validasi apakah 'id' video disediakan
     if (!videoId) {
+        // Jika ID tidak ada, kembalikan status 400 Bad Request
         return res.status(400).json({ message: 'Video ID is required.' });
     }
 
-    // Cari URL video berdasarkan ID unik
+    // Mencari URL video berdasarkan ID unik yang diminta
     const videoUrl = videoMap.get(videoId);
 
+    // Jika URL video tidak ditemukan di videoMap
     if (!videoUrl) {
-        return res.status(404).json({ message: 'Video not found.' });
+        // Kembalikan status 404 Not Found
+        return res.status(404).json({ message: `Video with ID '${videoId}' not found.` });
     }
 
-    // Mengembalikan URL video sebagai JSON
+    // Jika video ditemukan, kembalikan URL sebagai JSON dengan status 200 OK
     res.status(200).json({ url: videoUrl });
 };
