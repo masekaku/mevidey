@@ -1,13 +1,16 @@
 {
   "name": "mevidey-api",
   "version": "1.0.0",
-  "description": "Serverless API for video URLs",
-  "main": "api/get-video.js", // Ini menunjukkan entry point
+  "description": "Serverless API for video URLs on Vercel",
+  "main": "api/get-video.js",
   "scripts": {
-    "start": "vercel dev" // Untuk development lokal jika pakai Vercel CLI
+    "start": "node api/get-video.js"
+    // Anda bisa tambahkan script lain jika diperlukan
   },
   "dependencies": {
-    // Tambahkan dependensi jika Anda menggunakannya di get-video.js
-    // contoh: "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+    // Tambahkan dependensi lain yang Anda gunakan di api/get-video.js jika ada
   }
 }
