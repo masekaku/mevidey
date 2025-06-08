@@ -1,22 +1,6 @@
 // api/get-video.js
-
-// Ini adalah daftar URL video Anda yang sebenarnya.
-// IDEALNYA, DAFTAR INI AKAN DIATUR SEBAGAI VARIABEL LINGKUNGAN DI VERCEL,
-// BUKAN HARDCODE DI SINI, UNTUK KEAMANAN MAKSIMAL.
-// Tapi untuk contoh awal, kita letakkan di sini.
-// Untuk produksi, Anda harus menggunakan process.env.VIDEO_URLS
-const VIDEO_URLS = [
-    'https://cdn.videy.co/mpDeq1.mp4',
-    'https://cdn.videy.co/AbX19RQp1.mp4',
-    'https://cdn.videy.co/4dxBUUww1.mp4',
-    'https://cdn.videy.co/video4.mp4',
-    'https://cdn.videy.co/video5.mp4',
-    'https://cdn.videy.co/video6.mp4',
-    'https://cdn.videy.co/video7.mp4',
-    'https://cdn.videy.co/video8.mp4',
-    'https://cdn.videy.co/video9.mp4',
-    'https://cdn.videy.co/video10.mp4'
-];
+const rawVideoUrls = process.env.VIDEO_URLS;
+const VIDEO_URLS = rawVideoUrls ? rawVideoUrls.split(',') : [];
 
 module.exports = (req, res) => {
     // Mengizinkan CORS dari domain frontend Anda (ganti dengan domain pages.dev Anda)
